@@ -6,6 +6,7 @@ from pathlib import Path
 
 # ---------- paths ----------
 STATS_JSON_PATH = Path("data/nba_player_stats_2000_2025.json")
+MODERN_PLAYERS_PATH = Path("data/modern_nba_players.json")
 MISSING_CSV_PATH = Path("data/nba_player_missing_seasons.csv")
 DRAFT_JSON_PATH = Path("data/draft_history.json")
 DB_PATH = Path("data/nba_stats.db")
@@ -13,7 +14,7 @@ DB_PATH = Path("data/nba_stats.db")
 
 # ---------- helpers ----------
 def safe_float(x):
-    """Convert to float; return None if missing/invalid (becomes NULL in SQLite)."""
+    """Convert to float; return None if missing/invalid."""
     try:
         return float(x)
     except (TypeError, ValueError):
@@ -22,58 +23,42 @@ def safe_float(x):
 
 def compute_metrics(r):
     """
-    Compute:
-      eFG% = (FGM + 0.5*FG3M) / FGA
-      TS%  = PTS / (2*(FGA + 0.44*FTA))
-      per-36 for PTS/REB/AST = stat * 36 / MIN
+    Compute efficiency metrics and expanded per-36 stats.
     """
     min_ = safe_float(r.get("MIN"))
     pts = safe_float(r.get("PTS"))
     reb = safe_float(r.get("REB"))
     ast_ = safe_float(r.get("AST"))
+    stl = safe_float(r.get("STL"))
+    blk = safe_float(r.get("BLK"))
 
     fgm = safe_float(r.get("FGM"))
     fga = safe_float(r.get("FGA"))
     fg3m = safe_float(r.get("FG3M"))
     fta = safe_float(r.get("FTA"))
 
-    # eFG%
-    efg = None
-    if fga is not None and fga > 0 and fgm is not None and fg3m is not None:
-        efg = (fgm + 0.5 * fg3m) / fga
+    # eFG% & TS%
+    efg = (fgm + 0.5 * fg3m) / fga if fga and fga > 0 else None
+    ts = pts / (2 * (fga + 0.44 * fta)) if pts and (fga or fta) and (fga + 0.44 * fta) > 0 else None
 
-    # TS%
-    ts = None
-    if pts is not None and fga is not None and fta is not None:
-        denom = 2 * (fga + 0.44 * fta)
-        if denom > 0:
-            ts = pts / denom
-
-    # per-36
-    pts_36 = reb_36 = ast_36 = None
-    if min_ is not None and min_ > 0:
+    # Per-36 (Expanded)
+    p36 = r36 = a36 = s36 = b36 = None
+    if min_ and min_ > 0:
         factor = 36.0 / min_
-        if pts is not None:
-            pts_36 = pts * factor
-        if reb is not None:
-            reb_36 = reb * factor
-        if ast_ is not None:
-            ast_36 = ast_ * factor
+        p36 = pts * factor if pts is not None else None
+        r36 = reb * factor if reb is not None else None
+        a36 = ast_ * factor if ast_ is not None else None
+        s36 = stl * factor if stl is not None else None
+        b36 = blk * factor if blk is not None else None
 
-    return ts, efg, pts_36, reb_36, ast_36
+    return ts, efg, p36, r36, a36, s36, b36
 
 
 def parse_listish_cell(cell):
-    """
-    Your CSV columns look like: "['2011-12']" or "[]"
-    Use ast.literal_eval safely.
-    Return python list.
-    """
-    if cell is None:
-        return []
+    """Handles CSV columns like: "['2011-12']" """
+    if cell is None: return []
     cell = str(cell).strip()
-    if cell == "":
-        return []
+    if not cell: return []
     try:
         val = ast.literal_eval(cell)
         return val if isinstance(val, list) else []
@@ -82,7 +67,8 @@ def parse_listish_cell(cell):
 
 
 # ---------- loaders ----------
-def create_player_season_stats(cur):
+def load_player_season_stats(cur):
+    rows = json.loads(STATS_JSON_PATH.read_text())
     cur.execute("""
     CREATE TABLE player_season_stats (
         player_id INTEGER NOT NULL,
@@ -91,208 +77,89 @@ def create_player_season_stats(cur):
         team_abbreviation TEXT,
         season TEXT NOT NULL,
         age REAL,
-
         gp INTEGER,
         w INTEGER,
         l INTEGER,
         w_pct REAL,
         min REAL,
-
-        fgm REAL, fga REAL,
-        fg3m REAL, fg3a REAL,
-        ftm REAL, fta REAL,
-
+        fgm REAL, fga REAL, fg_pct REAL,
+        fg3m REAL, fg3a REAL, fg3_pct REAL,
+        ftm REAL, fta REAL, ft_pct REAL,
         oreb REAL, dreb REAL, reb REAL,
         ast REAL, tov REAL,
         stl REAL, blk REAL, pf REAL,
-        pts REAL,
-        plus_minus REAL,
-
-        ts_pct REAL,
-        efg_pct REAL,
-        pts_per36 REAL,
-        reb_per36 REAL,
-        ast_per36 REAL,
-
+        pts REAL, plus_minus REAL,
+        ts_pct REAL, efg_pct REAL,
+        pts_per36 REAL, reb_per36 REAL, ast_per36 REAL,
+        stl_per36 REAL, blk_per36 REAL,
         PRIMARY KEY (player_id, season)
     );
     """)
 
-
-def load_player_season_stats(cur):
-    if not STATS_JSON_PATH.exists():
-        raise FileNotFoundError(f"Missing input JSON: {STATS_JSON_PATH}")
-
-    rows = json.loads(STATS_JSON_PATH.read_text())
-    if not rows:
-        raise ValueError("Stats JSON file is empty.")
-
-    required_keys = {
-        "PLAYER_ID", "PLAYER_NAME", "TEAM_ID", "TEAM_ABBREVIATION", "SEASON",
-        "AGE", "GP", "MIN", "W", "L", "W_PCT",
-        "FGM", "FGA", "FG3M", "FG3A", "FTM", "FTA",
-        "OREB", "DREB", "REB", "AST", "TOV", "STL", "BLK", "PF", "PTS", "PLUS_MINUS",
-    }
-    missing = required_keys - set(rows[0].keys())
-    if missing:
-        raise KeyError(f"Stats JSON missing required keys: {sorted(missing)}")
-
-    create_player_season_stats(cur)
-
-    insert_sql = """
-    INSERT INTO player_season_stats (
-        player_id, player_name, team_id, team_abbreviation, season, age,
-        gp, w, l, w_pct, min,
-        fgm, fga, fg3m, fg3a, ftm, fta,
-        oreb, dreb, reb, ast, tov, stl, blk, pf, pts, plus_minus,
-        ts_pct, efg_pct, pts_per36, reb_per36, ast_per36
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-    """
-
+    sql = "INSERT INTO player_season_stats VALUES (" + ",".join(["?"] * 37) + ")"
     for r in rows:
-        ts, efg, p36, r36, a36 = compute_metrics(r)
-
-        values = [
-            r["PLAYER_ID"],
-            r["PLAYER_NAME"],
-            r["TEAM_ID"],
-            r["TEAM_ABBREVIATION"],
-            r["SEASON"],
-            safe_float(r.get("AGE")),
-
-            r.get("GP"),
-            r.get("W"),
-            r.get("L"),
-            safe_float(r.get("W_PCT")),
-            safe_float(r.get("MIN")),
-
-            safe_float(r.get("FGM")), safe_float(r.get("FGA")),
-            safe_float(r.get("FG3M")), safe_float(r.get("FG3A")),
-            safe_float(r.get("FTM")), safe_float(r.get("FTA")),
-
+        m = compute_metrics(r)
+        cur.execute(sql, [
+            r["PLAYER_ID"], r["PLAYER_NAME"], r["TEAM_ID"], r["TEAM_ABBREVIATION"], r["SEASON"],
+            safe_float(r.get("AGE")), r.get("GP"), r.get("W"), r.get("L"), safe_float(r.get("W_PCT")),
+            safe_float(r.get("MIN")), safe_float(r.get("FGM")), safe_float(r.get("FGA")), safe_float(r.get("FG_PCT")),
+            safe_float(r.get("FG3M")), safe_float(r.get("FG3A")), safe_float(r.get("FG3_PCT")),
+            safe_float(r.get("FTM")), safe_float(r.get("FTA")), safe_float(r.get("FT_PCT")),
             safe_float(r.get("OREB")), safe_float(r.get("DREB")), safe_float(r.get("REB")),
-            safe_float(r.get("AST")), safe_float(r.get("TOV")),
-            safe_float(r.get("STL")), safe_float(r.get("BLK")), safe_float(r.get("PF")),
-            safe_float(r.get("PTS")),
-            safe_float(r.get("PLUS_MINUS")),
-
-            ts, efg, p36, r36, a36
-        ]
-
-        cur.execute(insert_sql, values)
-
-    # indexes
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_pss_player_name ON player_season_stats(player_name);")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_pss_season ON player_season_stats(season);")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_pss_team_abbrev ON player_season_stats(team_abbreviation);")
-
-    n = cur.execute("SELECT COUNT(*) FROM player_season_stats;").fetchone()[0]
-    print(f"✅ Rows inserted (player_season_stats): {n}")
+            safe_float(r.get("AST")), safe_float(r.get("TOV")), safe_float(r.get("STL")), 
+            safe_float(r.get("BLK")), safe_float(r.get("PF")), safe_float(r.get("PTS")), 
+            safe_float(r.get("PLUS_MINUS")), *m
+        ])
 
 
-def rebuild_players_from_stats(cur):
-    """
-    IMPORTANT:
-    players table is derived from player_season_stats,
-    so joins by player_id will always work.
-    """
-    cur.execute("DROP TABLE IF EXISTS players;")
-    cur.execute("""
-    CREATE TABLE players AS
-    SELECT DISTINCT
-        player_id,
-        player_name AS full_name
-    FROM player_season_stats;
-    """)
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_players_player_id ON players(player_id);")
-
-    n = cur.execute("SELECT COUNT(*) FROM players;").fetchone()[0]
-    print(f"✅ Rows inserted (players from stats): {n}")
+def load_modern_players(cur):
+    """Loads players table from data/modern_nba_players.json."""
+    if not MODERN_PLAYERS_PATH.exists(): return
+    data = json.loads(MODERN_PLAYERS_PATH.read_text())
+    cur.execute("CREATE TABLE modern_players (player_id INTEGER PRIMARY KEY, full_name TEXT NOT NULL, is_active INTEGER);")
+    for p in data:
+        cur.execute("INSERT OR IGNORE INTO modern_players VALUES (?,?,?)", 
+                    (p.get("id"), p.get("full_name"), p.get("is_active")))
 
 
 def load_player_missing_seasons(cur):
-    if not MISSING_CSV_PATH.exists():
-        print(f"⚠️ Missing CSV (skip): {MISSING_CSV_PATH}")
-        return 0
-
-    cur.execute("""
-    CREATE TABLE player_missing_seasons (
-        player_name TEXT NOT NULL,
-        seasons_json TEXT NOT NULL,
-        missing_seasons_json TEXT NOT NULL
-    );
-    """)
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_pms_player_name ON player_missing_seasons(player_name);")
-
-    inserted = 0
+    """Parses the CSV into a JSON-string storage table."""
+    if not MISSING_CSV_PATH.exists(): return
+    cur.execute("CREATE TABLE player_missing_seasons (player_name TEXT, seasons_json TEXT, missing_seasons_json TEXT);")
     with MISSING_CSV_PATH.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        expected = {"PLAYER_NAME", "SEASONS", "MISSING_SEASONS"}
-        if not expected.issubset(set(reader.fieldnames or [])):
-            raise KeyError(f"Missing CSV columns. Need {expected}, got {reader.fieldnames}")
-
         for row in reader:
-            player_name = (row.get("PLAYER_NAME") or "").strip()
-            seasons_list = parse_listish_cell(row.get("SEASONS"))
-            missing_list = parse_listish_cell(row.get("MISSING_SEASONS"))
-
-            cur.execute(
-                "INSERT INTO player_missing_seasons (player_name, seasons_json, missing_seasons_json) VALUES (?,?,?);",
-                (player_name, json.dumps(seasons_list), json.dumps(missing_list))
-            )
-            inserted += 1
-
-    print(f"✅ Rows inserted (player_missing_seasons): {inserted}")
-    return inserted
+            cur.execute("INSERT INTO player_missing_seasons VALUES (?,?,?);",
+                        (row.get("PLAYER_NAME"), 
+                         json.dumps(parse_listish_cell(row.get("SEASONS"))), 
+                         json.dumps(parse_listish_cell(row.get("MISSING_SEASONS")))))
 
 
 def load_draft_history(cur):
-    if not DRAFT_JSON_PATH.exists():
-        print(f"⚠️ Missing JSON (skip): {DRAFT_JSON_PATH}")
-        return 0
-
+    if not DRAFT_JSON_PATH.exists(): return
     rows = json.loads(DRAFT_JSON_PATH.read_text())
-    if not rows:
-        print("⚠️ Draft JSON empty (skip).")
-        return 0
-
-    # minimal schema based on your screenshot
-    cur.execute("""
-    CREATE TABLE draft_history (
-        person_id INTEGER,
-        player_name TEXT,
-        season TEXT,
-        round_number INTEGER,
-        round_pick INTEGER,
-        overall_pick INTEGER,
-        draft_type TEXT,
-        team_id INTEGER,
-        team_city TEXT,
-        team_name TEXT,
-        team_abbreviation TEXT,
-        organization TEXT,
-        organization_type TEXT,
-        player_profile_flag INTEGER
-    );
-    """)
-
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_draft_player_name ON draft_history(player_name);")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_draft_season ON draft_history(season);")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_draft_overall_pick ON draft_history(overall_pick);")
-
-    insert_sql = """
-    INSERT INTO draft_history (
-        person_id, player_name, season, round_number, round_pick, overall_pick, draft_type,
-        team_id, team_city, team_name, team_abbreviation,
-        organization, organization_type, player_profile_flag
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-    """
-
-    inserted = 0
+    cur.execute("""CREATE TABLE draft_history (
+        PERSON_ID INTEGER, 
+        PLAYER_NAME TEXT, 
+        SEASON TEXT, 
+        ROUND_NUMBER INTEGER,
+        ROUND_PICK INTEGER,
+        OVERALL_PICK INTEGER, 
+        DRAFT_TYPE TEXT,
+        TEAM_ID INTEGER,
+        TEAM_CITY TEXT,
+        TEAM_NAME TEXT,
+        TEAM_ABBREVIATION TEXT, 
+        ORGANIZATION TEXT,
+        ORGANIZATION_TYPE TEXT,
+        PLAYER_PROFILE_FLAG INTEGER
+    );""")
     for r in rows:
-        cur.execute(insert_sql, (
-            r.get("PERSON_ID"),
-            r.get("PLAYER_NAME"),
+        cur.execute("""INSERT INTO draft_history VALUES (
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?
+        )""", (
+            r.get("PERSON_ID"), 
+            r.get("PLAYER_NAME"), 
             r.get("SEASON"),
             r.get("ROUND_NUMBER"),
             r.get("ROUND_PICK"),
@@ -301,84 +168,29 @@ def load_draft_history(cur):
             r.get("TEAM_ID"),
             r.get("TEAM_CITY"),
             r.get("TEAM_NAME"),
-            r.get("TEAM_ABBREVIATION"),
+            r.get("TEAM_ABBREVIATION"), 
             r.get("ORGANIZATION"),
             r.get("ORGANIZATION_TYPE"),
-            r.get("PLAYER_PROFILE_FLAG"),
+            r.get("PLAYER_PROFILE_FLAG")
         ))
-        inserted += 1
-
-    print(f"✅ Rows inserted (draft_history): {inserted}")
-    return inserted
 
 
-# ---------- main ----------
 def main():
-    # recreate db
-    if DB_PATH.exists():
-        DB_PATH.unlink()
-
+    if DB_PATH.exists(): DB_PATH.unlink()
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
-
-    # speed + durability defaults for local analytics
     cur.execute("PRAGMA journal_mode=WAL;")
     cur.execute("PRAGMA synchronous=NORMAL;")
 
-    print(f"✅ DB created: {DB_PATH}")
-
-    # 1) core stats table
+    print(f"🚀 Rebuilding Database: {DB_PATH}")
     load_player_season_stats(cur)
-
-    # 2) derive players from stats
-    rebuild_players_from_stats(cur)
-
-    # 3) missing seasons table (csv -> json text in db)
+    load_modern_players(cur)
     load_player_missing_seasons(cur)
-
-    # 4) draft history table
     load_draft_history(cur)
-
+    
     con.commit()
-
-    # ---- sanity samples ----
-    sample_ts = cur.execute("""
-        SELECT player_name, season, team_abbreviation, pts, ts_pct, efg_pct
-        FROM player_season_stats
-        WHERE ts_pct IS NOT NULL
-        ORDER BY ts_pct DESC
-        LIMIT 5;
-    """).fetchall()
-
-    print("\nTop 5 TS% seasons (sample):")
-    for row in sample_ts:
-        print(row)
-
-    sample_missing = cur.execute("""
-        SELECT player_name, missing_seasons_json
-        FROM player_missing_seasons
-        WHERE missing_seasons_json != '[]'
-        LIMIT 5;
-    """).fetchall()
-
-    print("\nSample missing seasons:")
-    for row in sample_missing:
-        print(row)
-
-    sample_draft = cur.execute("""
-        SELECT season, overall_pick, player_name, team_abbreviation, organization
-        FROM draft_history
-        WHERE overall_pick IS NOT NULL
-        ORDER BY CAST(season AS INTEGER) DESC, overall_pick ASC
-        LIMIT 5;
-    """).fetchall()
-
-    print("\nSample draft picks:")
-    for row in sample_draft:
-        print(row)
-
+    print("✅ All tables loaded successfully.")
     con.close()
-
 
 if __name__ == "__main__":
     main()

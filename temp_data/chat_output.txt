@@ -1,0 +1,77 @@
+Short Answer: The players who've made 175 total threes in a season since 2023-24 are Anthony Edwards, Bogdan Bogdanovic, Brandon Miller, Buddy Hield, CJ McCollum, Coby White, Corey Kispert, D'Angelo Russell, Damian Lillard, De'Aaron Fox, Dejounte Murray, Derrick White, Donovan Mitchell, Donte DiVincenzo, Duncan Robinson, Fred VanVleet, Gary Trent Jr., Grayson Allen, Jalen Brunson, Jalen Green, James Harden, Jayson Tatum, Jordan Poole, Keegan Murray, Klay Thompson, Lauri Markkanen, Luka Doncic, Malik Beasley, Michael Porter Jr., Mikal Bridges, Mike Conley, Paul George, Sam Hauser, Stephen Curry, Tim Hardaway Jr., Tyrese Haliburton, and Tyrese Maxey.
+
+Full Dataset:
+| Player Name         | Season   | Total Threes |
+|---------------------|----------|--------------|
+| Anthony Edwards     | 2023-24  | 189.6        |
+| Bogdan Bogdanovic   | 2023-24  | 237.0        |
+| Brandon Miller      | 2023-24  | 185.0        |
+| Buddy Hield         | 2023-24  | 218.4        |
+| CJ McCollum         | 2023-24  | 237.6        |
+| Coby White          | 2023-24  | 205.4        |
+| Corey Kispert       | 2023-24  | 184.0        |
+| D'Angelo Russell    | 2023-24  | 228.0        |
+| Damian Lillard      | 2023-24  | 219.0        |
+| De'Aaron Fox        | 2023-24  | 214.6        |
+| Dejounte Murray     | 2023-24  | 202.8        |
+| Derrick White       | 2023-24  | 197.1        |
+| Donovan Mitchell    | 2023-24  | 181.5        |
+| Donte DiVincenzo    | 2023-24  | 283.5        |
+| Duncan Robinson     | 2023-24  | 190.4        |
+| Fred VanVleet       | 2023-24  | 226.3        |
+| Gary Trent Jr.      | 2023-24  | 177.5        |
+| Grayson Allen       | 2023-24  | 202.5        |
+| Jalen Brunson       | 2023-24  | 207.9        |
+| Jalen Green         | 2023-24  | 205.0        |
+| James Harden        | 2023-24  | 187.2        |
+| Jayson Tatum        | 2023-24  | 229.4        |
+| Jordan Poole        | 2023-24  | 187.2        |
+| Keegan Murray       | 2023-24  | 184.8        |
+| Klay Thompson       | 2023-24  | 269.5        |
+| Lauri Markkanen     | 2023-24  | 176.0        |
+| Luka Doncic         | 2023-24  | 287.0        |
+| Malik Beasley       | 2023-24  | 221.2        |
+| Michael Porter Jr.  | 2023-24  | 218.7        |
+| Mikal Bridges       | 2023-24  | 221.4        |
+| Mike Conley         | 2023-24  | 182.4        |
+| Paul George         | 2023-24  | 244.2        |
+| Sam Hauser          | 2023-24  | 197.5        |
+| Stephen Curry       | 2023-24  | 355.2        |
+| Tim Hardaway Jr.    | 2023-24  | 213.3        |
+| Tyrese Haliburton   | 2023-24  | 193.2        |
+| Tyrese Maxey        | 2023-24  | 210.0        |
+| Anfernee Simons     | 2024-25  | 217.0        |
+| Anthony Edwards     | 2024-25  | 323.9        |
+| Austin Reaves       | 2024-25  | 197.1        |
+| Buddy Hield         | 2024-25  | 205.0        |
+| Coby White          | 2024-25  | 214.6        |
+| Damian Lillard      | 2024-25  | 197.2        |
+| Darius Garland      | 2024-25  | 210.0        |
+| Derrick White       | 2024-25  | 266.0        |
+| Devin Booker        | 2024-25  | 180.0        |
+| Dillon Brooks       | 2024-25  | 187.5        |
+| Donovan Mitchell    | 2024-25  | 234.3        |
+| Duncan Robinson     | 2024-25  | 192.4        |
+| Gary Trent Jr.      | 2024-25  | 177.6        |
+| Isaiah Joe          | 2024-25  | 192.4        |
+| Jalen Green         | 2024-25  | 237.8        |
+| James Harden        | 2024-25  | 237.0        |
+| Jayson Tatum        | 2024-25  | 252.0        |
+| Jordan Poole        | 2024-25  | 238.0        |
+| Julian Champagnie   | 2024-25  | 180.4        |
+| Klay Thompson       | 2024-25  | 216.0        |
+| LaMelo Ball         | 2024-25  | 178.6        |
+| Luka Doncic         | 2024-25  | 175.0        |
+| Malik Beasley       | 2024-25  | 319.8        |
+| Michael Porter Jr.  | 2024-25  | 192.5        |
+| Naz Reid            | 2024-25  | 176.0        |
+| Norman Powell       | 2024-25  | 180.0        |
+| Payton Pritchard    | 2024-25  | 256.0        |
+| Royce O'Neale       | 2024-25  | 180.0        |
+| Stephen Curry       | 2024-25  | 308.0        |
+| Trae Young          | 2024-25  | 220.4        |
+| Tyler Herro         | 2024-25  | 254.1        |
+| Tyrese Haliburton   | 2024-25  | 219.0        |
+| Zach LaVine         | 2024-25  | 236.8        |
+
+Summary: The data provides a list of players who have made 175 total threes in a season since 2023-24. The list includes various players such as Stephen Curry, Damian Lillard, Donovan Mitchell, and others who have achieved this milestone in different seasons.

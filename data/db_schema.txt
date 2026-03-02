@@ -1,0 +1,42 @@
+CREATE TABLE player_season_stats (
+        player_id INTEGER NOT NULL,
+        player_name TEXT NOT NULL,
+        team_id INTEGER,
+        team_abbreviation TEXT,
+        season TEXT NOT NULL,
+        age REAL,
+        gp INTEGER,
+        w INTEGER,
+        l INTEGER,
+        w_pct REAL,
+        min REAL,
+        fgm REAL, fga REAL, fg_pct REAL,
+        fg3m REAL, fg3a REAL, fg3_pct REAL,
+        ftm REAL, fta REAL, ft_pct REAL,
+        oreb REAL, dreb REAL, reb REAL,
+        ast REAL, tov REAL,
+        stl REAL, blk REAL, pf REAL,
+        pts REAL, plus_minus REAL,
+        ts_pct REAL, efg_pct REAL,
+        pts_per36 REAL, reb_per36 REAL, ast_per36 REAL,
+        stl_per36 REAL, blk_per36 REAL,
+        PRIMARY KEY (player_id, season)
+    )
+CREATE TABLE modern_players (player_id INTEGER PRIMARY KEY, full_name TEXT NOT NULL, is_active INTEGER)
+CREATE TABLE player_missing_seasons (player_name TEXT, seasons_json TEXT, missing_seasons_json TEXT)
+CREATE TABLE draft_history (
+        PERSON_ID INTEGER, 
+        PLAYER_NAME TEXT, 
+        SEASON TEXT, 
+        ROUND_NUMBER INTEGER,
+        ROUND_PICK INTEGER,
+        OVERALL_PICK INTEGER, 
+        DRAFT_TYPE TEXT,
+        TEAM_ID INTEGER,
+        TEAM_CITY TEXT,
+        TEAM_NAME TEXT,
+        TEAM_ABBREVIATION TEXT, 
+        ORGANIZATION TEXT,
+        ORGANIZATION_TYPE TEXT,
+        PLAYER_PROFILE_FLAG INTEGER
+    )
