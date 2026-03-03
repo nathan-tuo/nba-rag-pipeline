@@ -1,0 +1,7 @@
+Some fun prompts to try out: 
+1. players with a dash in their name, stats from their best season
+2. every player with an apostrophe in their name
+3. give me every #1 overall pick's stats (in their rookie season)  from the 2000s to now
+4. Players selected from Duke (since 2015)
+5. Compare lebron and kd seasons in the 2010s (side by side)
+6. 

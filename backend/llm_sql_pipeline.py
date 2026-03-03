@@ -3,6 +3,7 @@ import json
 import sqlite3
 import pickle
 import pprint
+from urllib import response
 import pandas as pd
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -22,7 +23,8 @@ sql_template = """
     6. Percentage stats should be in decimal form, so 50% should be 0.5, 45.3% should be 0.453, etc.
     7. Counting stats are all in their per game form, if a user asks for totals on the season, multiply those stats by games played
     8. When matching players between tables, always match on player_id if possible, as that is the most accurate way to match players. Only match on player_name if player_id is not available in both tables.
-    9. IMPORTANT: Always subtract 0.01 from any counting stats, so if the user asks for a specific counting stats, such as "who averaged >=24 ppg", write in the SQL >=23.99 instead of >=24, to account for any rounding issues in the data. Mind this should only be applied to counting stats like points, rebounds, assists, steals and blocks, not percentage stats like shooting percentages, or advanced stats like PER, win shares, etc. 
+    9. Use context to infer any necessary JOINS between tables, for example questions about rookies or draft classes should likely involve using the draft_history table, questions about missing seasons should involve using the missing_seasons table, etc. When in doubt, use JOINs to combine tables and get the most comprehensive data possible to answer the question.
+    10. IMPORTANT: Always subtract 0.01 from any counting stats, so if the user asks for a specific counting stats, such as "who averaged >=24 ppg", write in the SQL >=23.99 instead of >=24, to account for any rounding issues in the data. Mind this should only be applied to counting stats like points, rebounds, assists, steals and blocks, not percentage stats like shooting percentages, or advanced stats like PER, win shares, etc. 
 
     Finally, here's the order I'd like you to give me the information
     1. The table name that is most relevant to the user's question, based on the schema and the question. Only output one table name, and it should be the most relevant one to the user's question. This will be used to determine which table to query from.
@@ -35,6 +37,9 @@ sql_template = """
     Question: {question}
 
     SQL Query:"""
+
+def parentdir():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # --- 1. Data Models ---
 class SQLQueryResult(BaseModel):
     table_name: str = Field(description="The name of the table used in the query")
@@ -50,13 +55,13 @@ def setup_environment():
     os.environ["OPENAI_API_KEY"] = os.getenv("OPEN_AI_API_KEY")
 
 # --- 3. Database Functions ---
-def get_schema(db_path="data/nba_stats.db"):
+def get_schema(db_path=os.path.join(parentdir(), "data", "nba_stats.db")):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT sql FROM sqlite_master WHERE type='table';")
     schema = "\n".join([row[0] for row in cursor.fetchall() if row[0]])
     conn.close()
-    with open("data/db_schema.txt", "w") as f:
+    with open(os.path.join(parentdir(), "data", "db_schema.txt"), "w") as f:
         f.write(schema)
     return schema
 # Add this to your tester.py
@@ -72,7 +77,8 @@ def get_sql_chain(sql_template=sql_template):
     sql_prompt = ChatPromptTemplate.from_template(sql_template)
     
     return sql_prompt | structured_llm
-def execute_query(query, db_path="data/nba_stats.db"):
+def execute_query(query, db_path=os.path.join(parentdir(), "data", "nba_stats.db")):
+    print(db_path)
     conn = sqlite3.connect(db_path)
     df = pd.read_sql_query(query, conn)
     conn.close()
@@ -80,7 +86,7 @@ def execute_query(query, db_path="data/nba_stats.db"):
 
 # --- 4. LLM Operations ---
 def generate_sql(question, schema, sql_template=sql_template):
-    llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+    llm = ChatOpenAI(model_name="gpt-5.2", temperature=0)
     structured_llm = llm.with_structured_output(SQLQueryResult)
     
     # Your full, unabbreviated template
@@ -130,7 +136,7 @@ def get_final_analysis(question, evidence_json):
 # --- 5. Main Execution ---
 def main(question):
     setup_environment()
-    db_path = "data/nba_stats.db"
+    db_path = os.path.join(parentdir(), "data", "nba_stats.db")
     
     schema = get_schema(db_path)
     question = question
@@ -144,11 +150,11 @@ def main(question):
         "row_count": len(df_result),
         "data": df_result.to_dict(orient="records")
     }
-    evidence_json = json.dumps(evidence_packet, ensure_ascii=False, indent=2)
+    df = pd.DataFrame(evidence_packet["data"])
+    with open(os.path.join(parentdir(), "temp_data", generated_sql.table_name + ".csv"), "wb") as f:
+        pickle.dump(evidence_packet, f)
     
-    if not os.path.exists("temp_data"):
-        os.makedirs("temp_data")
-        
+    evidence_json = json.dumps(evidence_packet, ensure_ascii=False, indent=2)
     analysis = get_final_analysis(question, evidence_json)
     print(analysis)
 
