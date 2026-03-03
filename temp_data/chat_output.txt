@@ -1,48 +1,35 @@
-Short Answer: The evidence lists 35 players whose names include a dash (hyphen) and provides their stats from their best season (season, team, games, minutes, per-game box stats, TS%, and eFG%).
+Short Answer: Based on the provided evidence, the highest points-per-game season by last-name initial is James Harden (H) with 36.1 PPG in 2018-19; the dataset lists top PPG seasons for initials A–W and Y–Z (no entries provided for X).
 
 Full Dataset:
 
-| player_id | player_name | best_season | team_abbreviation | gp | min | pts | reb | ast | stl | blk | ts_pct | efg_pct |
-|---:|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1628983 | Shai Gilgeous-Alexander | 2024-25 | OKC | 76 | 34.2 | 32.7 | 5.0 | 6.4 | 1.7 | 1.0 | 0.6368806481770022 | 0.56651376146789 |
-| 1626157 | Karl-Anthony Towns | 2019-20 | MIN | 35 | 33.9 | 26.5 | 10.8 | 4.4 | 0.9 | 1.2 | 0.6413359148112294 | 0.598314606741573 |
-| 949 | Shareef Abdur-Rahim | 2001-02 | ATL | 77 | 38.7 | 21.2 | 9.0 | 3.1 | 1.3 | 1.1 | 0.5355699272433305 | 0.4732142857142857 |
-| 203487 | Michael Carter-Williams | 2013-14 | PHI | 70 | 34.5 | 16.7 | 6.2 | 6.3 | 1.9 | 0.6 | 0.48021624108580635 | 0.43046357615894043 |
-| 203484 | Kentavious Caldwell-Pope | 2015-16 | DET | 76 | 36.7 | 14.5 | 3.7 | 1.8 | 1.4 | 0.2 | 0.5208333333333334 | 0.4801587301587302 |
-| 1626178 | Rondae Hollis-Jefferson | 2017-18 | BKN | 68 | 28.2 | 13.9 | 6.8 | 2.5 | 1.0 | 0.7 | 0.5505386565272498 | 0.4811320754716981 |
-| 1626161 | Willie Cauley-Stein | 2017-18 | SAC | 73 | 28.0 | 12.8 | 7.0 | 2.4 | 1.1 | 0.9 | 0.5291005291005291 | 0.5 |
-| 203077 | Michael Kidd-Gilchrist | 2015-16 | CHA | 7 | 29.2 | 12.7 | 6.4 | 1.3 | 0.4 | 0.4 | 0.6045316070068545 | 0.5632183908045978 |
-| 1627827 | Dorian Finney-Smith | 2021-22 | DAL | 80 | 33.0 | 11.0 | 4.7 | 1.9 | 1.1 | 0.5 | 0.601750547045952 | 0.5977011494252873 |
-| 1629638 | Nickeil Alexander-Walker | 2020-21 | NOP | 46 | 21.9 | 11.0 | 3.1 | 2.2 | 1.0 | 0.5 | 0.5180859080633007 | 0.505 |
-| 1629659 | Talen Horton-Tucker | 2022-23 | UTA | 65 | 20.2 | 10.7 | 3.2 | 3.8 | 0.6 | 0.4 | 0.5073975720789073 | 0.4734042553191489 |
-| 202329 | Al-Farouq Aminu | 2015-16 | POR | 82 | 28.5 | 10.2 | 6.1 | 1.7 | 0.9 | 0.6 | 0.5292652552926524 | 0.4943181818181817 |
-| 201604 | Chris Douglas-Roberts | 2009-10 | NJN | 67 | 25.8 | 9.8 | 3.0 | 1.4 | 0.8 | 0.3 | 0.5097794423637121 | 0.4534883720930233 |
-| 1628966 | Keita Bates-Diop | 2022-23 | SAS | 67 | 21.7 | 9.7 | 3.7 | 1.5 | 0.7 | 0.3 | 0.6164209456024402 | 0.5652173913043478 |
-| 1631218 | Trayce Jackson-Davis | 2023-24 | GSW | 68 | 16.6 | 7.9 | 5.0 | 1.2 | 0.4 | 1.1 | 0.6886331938633193 | 0.693877551020408 |
-| 1627789 | Timothe Luwawu-Cabarrot | 2019-20 | BKN | 47 | 18.1 | 7.8 | 2.7 | 0.6 | 0.4 | 0.1 | 0.6048387096774193 | 0.5526315789473684 |
-| 1630526 | Jeremiah Robinson-Earl | 2021-22 | OKC | 49 | 22.2 | 7.5 | 5.6 | 1.0 | 0.6 | 0.3 | 0.5293619424054207 | 0.5000000000000001 |
-| 1641720 | Jalen Hood-Schifino | 2024-25 | PHI | 15 | 21.0 | 7.1 | 1.8 | 2.5 | 0.3 | 0.5 | 0.49887577290612706 | 0.4538461538461539 |
-| 1631241 | Javon Freeman-Liberty | 2023-24 | TOR | 22 | 18.3 | 7.0 | 3.2 | 1.8 | 0.5 | 0.2 | 0.5552030456852792 | 0.4910714285714286 |
-| 51 | Mahmoud Abdul-Rauf | 2000-01 | VAN | 41 | 11.8 | 6.5 | 0.6 | 1.9 | 0.2 | 0.0 | 0.5152187698161066 | 0.49166666666666664 |
-| 2064 | Khalid El-Amin | 2000-01 | CHI | 50 | 18.7 | 6.3 | 1.6 | 2.9 | 1.0 | 0.0 | 0.4621478873239437 | 0.4193548387096773 |
-| 1628504 | Xavier Rathan-Mayes | 2017-18 | MEM | 5 | 23.6 | 5.8 | 1.0 | 3.6 | 1.2 | 0.6 | 0.3154917319408181 | 0.2976190476190476 |
-| 1629308 | Juan Toscano-Anderson | 2020-21 | GSW | 53 | 20.9 | 5.7 | 4.4 | 2.8 | 0.8 | 0.5 | 0.6844380403458213 | 0.6794871794871795 |
-| 1917 | Wang Zhi-zhi | 2001-02 | DAL | 55 | 10.8 | 5.6 | 2.0 | 0.4 | 0.2 | 0.3 | 0.5668016194331983 | 0.5444444444444445 |
-| 1505 | Tariq Abdul-Wahad | 2001-02 | DAL | 24 | 18.4 | 5.6 | 3.5 | 1.0 | 0.8 | 0.4 | 0.4169148302561048 | 0.3770491803278688 |
-| 1626214 | Bryce Dejean-Jones | 2015-16 | NOP | 14 | 19.9 | 5.6 | 3.4 | 1.1 | 0.7 | 0.1 | 0.5035971223021583 | 0.5 |
-| 200822 | Pops Mensah-Bonsu | 2008-09 | TOR | 22 | 12.8 | 5.0 | 5.1 | 0.3 | 0.4 | 0.2 | 0.44107268877911077 | 0.3829787234042553 |
-| 1629625 | Justin Wright-Foreman | 2019-20 | UTA | 4 | 11.3 | 4.8 | 1.3 | 1.8 | 0.5 | 0.0 | 0.4411764705882352 | 0.41 |
-| 1641765 | Olivier-Maxence Prosper | 2024-25 | DAL | 52 | 11.2 | 3.9 | 2.4 | 0.8 | 0.5 | 0.1 | 0.49242424242424243 | 0.4242424242424243 |
-| 1628502 | Nigel Hayes-Davis | 2017-18 | SAC | 9 | 13.6 | 3.0 | 2.4 | 0.7 | 0.2 | 0.3 | 0.3914405010438413 | 0.37837837837837834 |
-| 1628513 | Naz Mitrou-Long | 2017-18 | UTA | 1 | 0.5 | 3.0 | 0.0 | 0.0 | 0.0 | 0.0 | 1.5 | 1.5 |
-| 1627875 | Marcus Georges-Hunt | 2016-17 | ORL | 5 | 9.5 | 2.8 | 1.8 | 0.6 | 0.2 | 0.0 | 0.6140350877192983 | 0.35714285714285715 |
-| 1628430 | Nigel Williams-Goss | 2019-20 | UTA | 10 | 5.0 | 1.4 | 0.6 | 0.6 | 0.3 | 0.1 | 0.41469194312796204 | 0.37499999999999994 |
-| 2257 | Ruben Boumtje-Boumtje | 2001-02 | POR | 33 | 7.4 | 1.2 | 1.7 | 0.1 | 0.1 | 0.5 | 0.44378698224852065 | 0.4 |
-| 1629152 | DeVaughn Akoon-Purcell | 2018-19 | DEN | 7 | 3.1 | 1.0 | 0.6 | 0.9 | 0.3 | 0.0 | 0.3263707571801567 | 0.28571428571428575 |
-| 1630234 | Ty-Shon Alexander | 2020-21 | PHX | 15 | 3.2 | 0.6 | 0.7 | 0.4 | 0.0 | 0.1 | 0.3554502369668246 | 0.3125 |
-| 203130 | Darius Johnson-Odom | 2012-13 | LAL | 4 | 1.4 | 0.0 | 1.0 | 0.3 | 0.0 | 0.0 | NaN | 0.0 |
-| 203590 | Trey McKinney-Jones | 2017-18 | IND | 1 | 1.2 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | NaN | NaN |
+| last_initial | player_id | player_name | season | pts |
+|---|---:|---|---|---:|
+| A | 203507 | Giannis Antetokounmpo | 2022-23 | 31.1 |
+| B | 977 | Kobe Bryant | 2005-06 | 35.4 |
+| C | 201939 | Stephen Curry | 2020-21 | 32.0 |
+| D | 1629029 | Luka Doncic | 2023-24 | 33.9 |
+| E | 203954 | Joel Embiid | 2023-24 | 34.7 |
+| F | 1628368 | De'Aaron Fox | 2023-24 | 26.6 |
+| G | 1628983 | Shai Gilgeous-Alexander | 2024-25 | 32.7 |
+| H | 201935 | James Harden | 2018-19 | 36.1 |
+| I | 947 | Allen Iverson | 2005-06 | 33.0 |
+| J | 2544 | LeBron James | 2005-06 | 31.4 |
+| K | 1628398 | Kyle Kuzma | 2023-24 | 22.2 |
+| L | 203081 | Damian Lillard | 2022-23 | 32.2 |
+| M | 1503 | Tracy McGrady | 2002-03 | 32.1 |
+| N | 1717 | Dirk Nowitzki | 2005-06 | 26.6 |
+| O | 406 | Shaquille O'Neal | 2000-01 | 28.7 |
+| P | 1718 | Paul Pierce | 2005-06 | 26.8 |
+| Q | 1630193 | Immanuel Quickley | 2024-25 | 17.1 |
+| R | 2072 | Michael Redd | 2006-07 | 26.7 |
+| S | 711 | Jerry Stackhouse | 2000-01 | 29.8 |
+| T | 1628369 | Jayson Tatum | 2022-23 | 30.1 |
+| U | 2757 | Beno Udrih | 2010-11 | 13.7 |
+| V | 202696 | Nikola Vucevic | 2020-21 | 23.4 |
+| W | 201566 | Russell Westbrook | 2016-17 | 31.6 |
+| Y | 1629027 | Trae Young | 2019-20 | 29.6 |
+| Z | 1627826 | Ivica Zubac | 2024-25 | 16.8 |
 
-Summary: Based on the evidence provided, every listed player has a dash (hyphen) in their name and is paired with a “best_season” plus per-game statistics (GP, MIN, PTS, REB, AST, STL, BLK) and efficiency metrics (TS% and eFG%) for that best season. The dataset includes 35 such players, ranging from high-usage seasons like Shai Gilgeous-Alexander (2024-25, 32.7 PPG) and Karl-Anthony Towns (2019-20, 26.5 PPG) down to players with minimal playing time where TS%/eFG% can be listed as NaN (e.g., Darius Johnson-Odom 2012-13; Trey McKinney-Jones 2017-18). No additional criteria for what defines “best season” is provided beyond the field itself.
+Summary: The evidence provides one highest-PPG season entry per last-name starting letter for A through W, plus Y and Z. In this dataset, the top values include James Harden (H) at 36.1 PPG (2018-19), Kobe Bryant (B) at 35.4 PPG (2005-06), and Joel Embiid (E) at 34.7 PPG (2023-24). The data does not include an entry for the letter X, so there is not enough data for a comprehensive A–Z list.
 
 Source: NBAstats.com

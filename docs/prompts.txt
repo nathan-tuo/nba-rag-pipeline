@@ -1,0 +1,11 @@
+10 fun prompts to try out: 
+1. players with a dash in their name, stats from their best season
+2. every player with an apostrophe in their name
+3. give me every #1 overall pick's stats (in their rookie season)  from the 2000s to now
+4. Players selected from Duke (since 2015)
+5. Compare lebron and kd seasons in the 2010s (side by side)
+6. lebron james sponsorships (meant to be irrelevant/not available from data)
+7. players to average at least 30 ppg on 60%+ True Shooting
+8. top 10 players who were Second round picks to average the most ppg in a season
+9. players that missed one season, then returned and averaged at least 15 ppg (struggles on two seasons for some reason)
+10. players to average the most points in a season per beginning letter of their last name (a-z)

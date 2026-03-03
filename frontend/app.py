@@ -19,7 +19,7 @@ st.title("🏀 NBA Gemini Data Pipeline")
 if 'nba_chain' not in st.session_state:
     st.session_state.nba_chain = get_sql_chain()
 st.markdown("This app allows you to ask question about NBA Stats. It will generate an SQL query based on the question, execute it against the database, and provide an analysis of the results.")
-st.markdown("The data avilable in the database includes REGULAR season player per game stats (2000-2025), draft history, missing seasons, and general player info. Please refrain from asking questions that require data outside of this scope.")
+st.markdown("The data available in the database includes REGULAR season player per game stats (2000-2025), draft history, missing seasons, and general player info. Please refrain from asking questions that require data outside of this scope.")
 question = st.text_input("Ask about NBA stats:")
 
 if st.button("Analyze") and question:

@@ -2,8 +2,6 @@ import os
 import json
 import sqlite3
 import pickle
-import pprint
-from urllib import response
 import pandas as pd
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
