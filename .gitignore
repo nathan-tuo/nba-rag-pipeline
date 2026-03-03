@@ -1,2 +1,3 @@
 .env
-tester
+tester.ipynb
+__pycache__/
